@@ -1,30 +1,31 @@
-from pymouse import PyMouse
+"""Mouse Tracking Script"""
+
 from time import sleep
 import signal
-import sys
+from pymouse import PyMouse
 
-mouse = PyMouse()
+MOUSE = PyMouse()
 
-capturing = True
-deltat = 0.1
+CAPTURING = True
+DELTAT = 0.1
 
 def capture_position():
     """Loop for mouse capture"""
-    while capturing:
-        sleep(0.1)
-        print("Mouse is at (%d,\t%d)" % mouse.position())
+    while CAPTURING:
+        sleep(DELTAT)
+        print("Mouse is at (%d,\t%d)" % MOUSE.position())
 
-def finish_capture(signal, frame):
+def finish_capture(sig, frame):
     """Finishes the capture of the movement and saves the data"""
-    global capturing
-    capturing = False
+    global CAPTURING
+    CAPTURING = False
     print("Finished capture")
 
 if __name__ == "__main__":
     print("Script initialized")
 
     # register ctrl c handler
-    signal.signal(signal.SIGINT, finish_capture);
+    signal.signal(signal.SIGINT, finish_capture)
 
     # go to capture loop
     capture_position()
