@@ -8,12 +8,15 @@ class TracePlotter:
 
     def __init__(self):
         # init fields
-        self.size = (1600, 900)
+        self.screen_size = (1600, 900)
+        self.oversize = 2
+        self.canvas_size = (self.oversize * self.screen_size[0], self.oversize
+                            * self.screen_size[1])
         self.input_file = "mouse_data.txt"
         self.output_file = "trace.jpg"
         self.mouse_data = np.array([], dtype=int)
         self.mouse_samples = 0
-        self.image = Image.new("RGB", size=self.size)
+        self.image = Image.new("RGB", size=self.canvas_size)
         self.draw = ImageDraw.Draw(self.image)
 
         # load input data from text file
@@ -36,14 +39,14 @@ class TracePlotter:
         """Iterates over Mouse Samples and Plots the Trace"""
         for i in range(0, self.mouse_samples - 1):
             # determine initial and final coordinates
-            x_i = self.mouse_data[0][i]
-            y_i = self.mouse_data[1][i]
-            x_f = self.mouse_data[0][i+1]
-            y_f = self.mouse_data[1][i+1]
+            x_i = self.oversize * self.mouse_data[0][i]
+            y_i = self.oversize * self.mouse_data[1][i]
+            x_f = self.oversize * self.mouse_data[0][i+1]
+            y_f = self.oversize * self.mouse_data[1][i+1]
             line_parameters = [(x_i, y_i), (x_f, y_f)]
 
-            self.draw.line(line_parameters, fill=(0, 0, 255))
+            self.draw.line(line_parameters, fill=(0, 0, 255), width=1)
 
 
 if __name__ == "__main__":
-    plotter = TracePlotter()
+    PLOTTER = TracePlotter()
