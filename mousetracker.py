@@ -8,7 +8,7 @@ from pymouse import PyMouse
 MOUSE = PyMouse()
 
 CAPTURING = True
-DELTAT = 1/24
+DELTAT = 1/60
 
 MOUSE_DATA = np.array([], dtype=int)
 
