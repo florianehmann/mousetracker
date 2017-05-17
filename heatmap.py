@@ -26,7 +26,7 @@ class Heatmap:
         # parameters and fields for Gaussian blur
         self.padx = int(self.screen_size[0] / 2)
         self.pady = int(self.screen_size[1] / 2)
-        self.peak_size = self.screen_size[1] / 40
+        self.peak_size = self.screen_size[1] / 50
 
         # load input data from text file
         self.load_data()
@@ -36,6 +36,7 @@ class Heatmap:
         self.plot_histogram()
 
         self.generate_heatmap()
+        self.normalize_heatmap()
         self.plot_heatmap()
 
         self.image_histogram.save(self.output_file_histogram)
@@ -114,12 +115,37 @@ class Heatmap:
         """Normalizes the Heatmap to Values from 0 to 1"""
         self.heatmap = self.heatmap / np.max(self.heatmap)
 
+    def color_gradient(self, l, lmin, lmax, ci, cf):
+        """A General Part of a Color Gradient"""
+        ci = np.array(ci)
+        cf = np.array(cf)
+        v = (cf - ci) / (lmax - lmin)
+        lconstrained = l
+        if (l > lmax):
+            lconstrained = lmax
+        elif (l < lmin):
+            lconstrained = 0
+        c = ci + (lconstrained - lmin) / (lmax - lmin) * v
+        return c
+
+    def color_function(self, l):
+        """Returns a Color of a Gradient"""
+        c = np.array([0,0,0])
+        if l < 0.5:
+            c = self.color_gradient(l, 0, 0.5, [0, 0, 0], [255, 0, 0])
+        elif l > 0.5:
+            c = self.color_gradient(l, 0.5, 1, [255, 0, 0], [255, 255, 255])
+
+        c = c.astype(int)
+        return tuple(c)
+
     def plot_heatmap(self):
         """Plots the Heatmap"""
         for xcoord in range(0, self.screen_size[0]):
             for ycoord in range(0, self.screen_size[1]):
-                blue = int(self.heatmap[xcoord][ycoord] * 255)
-                color = (0, blue, blue)
+                color = self.color_function(self.heatmap[xcoord][ycoord])
+                #blue = int(self.heatmap[xcoord][ycoord] * 255)
+                #color = (0, blue, blue)
                 self.draw_heatmap.point((xcoord, ycoord), fill=color)
 
 
