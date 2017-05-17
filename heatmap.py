@@ -57,7 +57,13 @@ class Heatmap:
             # increase pixel counter
             mousex = self.mouse_data[0][i]
             mousey = self.mouse_data[1][i]
-            self.histogram[mousex][mousey] += 1
+            if i > 0:
+                if mousex != self.mouse_data[0][i - 1] \
+                        or mousey != self.mouse_data[1][i - 1]:
+
+                    self.histogram[mousex][mousey] += 1
+            else:
+                self.histogram[mousex][mousey] += 1
 
     def normalize_histogram(self):
         """Normalizes the Histogram to values between 0.0 and 1.0"""
