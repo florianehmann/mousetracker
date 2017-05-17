@@ -45,7 +45,7 @@ class TracePlotter:
             y_f = self.oversize * self.mouse_data[1][i+1]
             line_parameters = [(x_i, y_i), (x_f, y_f)]
 
-            self.draw.line(line_parameters, fill=(0, 0, 255), width=1)
+            self.draw.line(line_parameters, fill=(0, 255, 255), width=1)
 
 
 if __name__ == "__main__":
