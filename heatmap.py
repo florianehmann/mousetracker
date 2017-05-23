@@ -26,20 +26,23 @@ class Heatmap:
         # parameters and fields for Gaussian blur
         self.padx = int(self.screen_size[0] / 2)
         self.pady = int(self.screen_size[1] / 2)
-        self.peak_size = self.screen_size[1] / 40
+        self.peak_size = self.screen_size[1] / 35
 
         # load input data from text file
+        print("Loading Data")
         self.load_data()
 
+        print("Generating Histogram")
         self.generate_histogram()
         self.normalize_histogram()
         self.plot_histogram()
+        self.image_histogram.save(self.output_file_histogram)
 
+        print("Generating Heatmap")
         self.generate_heatmap()
         self.normalize_heatmap()
+        print("Plotting Heatmap")
         self.plot_heatmap()
-
-        self.image_histogram.save(self.output_file_histogram)
         self.image_heatmap.save(self.output_file_heatmap)
 
     def load_data(self):
@@ -49,7 +52,7 @@ class Heatmap:
         # transpose mouse data, to let first index be x or y
         self.mouse_data = np.transpose(self.mouse_data)
         self.mouse_samples = np.size(self.mouse_data[0])
-        print("Processing %d samples" % self.mouse_samples)
+        print("\tLoaded %d samples" % self.mouse_samples)
 
     def generate_histogram(self):
         """Generates a Histogram from the Mouse Data"""
@@ -125,7 +128,7 @@ class Heatmap:
         """A General Part of a Color Gradient"""
         ci = np.array(ci)
         cf = np.array(cf)
-        v = (cf - ci) / (lmax - lmin)
+        v = (cf - ci)
         lconstrained = l
         if (l > lmax):
             lconstrained = lmax
@@ -137,17 +140,27 @@ class Heatmap:
     def color_function(self, l):
         """Returns a Color of a Gradient"""
         c = np.array([0,0,0])
-        if l < 0.5:
-            c = self.color_gradient(l, 0, 0.5, [0, 0, 0], [255, 0, 0])
-        elif l > 0.5:
-            c = self.color_gradient(l, 0.5, 1, [255, 0, 0], [255, 255, 255])
+        if l <= 0.3:
+        	c = self.color_gradient(l, 0, 0.3, [0, 0, 0], [204, 34, 0])
+        elif l > 0.3 and l <= 0.6:
+             c = self.color_gradient(l, 0.3, 0.6, [204, 34, 0], [255, 183, 0])
+        elif l > 0.6:
+             c = self.color_gradient(l, 0.6, 1.0, [255, 183, 0], [255, 255, 255])
 
         c = c.astype(int)
         return tuple(c)
 
     def plot_heatmap(self):
         """Plots the Heatmap"""
+        print("\tStart Plotting")
+
         for xcoord in range(0, self.screen_size[0]):
+            CURSOR_UP_ONE = '\x1b[1A'
+            ERASE_LINE = '\x1b[2K'
+            print(CURSOR_UP_ONE + ERASE_LINE, end='')
+            print("\tFinished %.1f percent of the Heatmap" %
+                  (xcoord * 100 / self.screen_size[0]))
+
             for ycoord in range(0, self.screen_size[1]):
                 color = self.color_function(self.heatmap[xcoord, ycoord])
                 #blue = int(self.heatmap[xcoord][ycoord] * 255)
