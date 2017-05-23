@@ -26,7 +26,7 @@ class Heatmap:
         # parameters and fields for Gaussian blur
         self.padx = int(self.screen_size[0] / 2)
         self.pady = int(self.screen_size[1] / 2)
-        self.peak_size = self.screen_size[1] / 50
+        self.peak_size = self.screen_size[1] / 40
 
         # load input data from text file
         self.load_data()
@@ -61,9 +61,9 @@ class Heatmap:
                 if mousex != self.mouse_data[0][i - 1] \
                         or mousey != self.mouse_data[1][i - 1]:
 
-                    self.histogram[mousex][mousey] += 1
+                    self.histogram[mousex, mousey] += 1
             else:
-                self.histogram[mousex][mousey] += 1
+                self.histogram[mousex, mousey] += 1
 
     def normalize_histogram(self):
         """Normalizes the Histogram to values between 0.0 and 1.0"""
@@ -73,7 +73,7 @@ class Heatmap:
         """Plots the normalized Histogram"""
         for xcoord in range(0, self.screen_size[0]):
             for ycoord in range(0, self.screen_size[1]):
-                blue = min(255, int(self.histogram[xcoord][ycoord] * 255 * 128))
+                blue = min(255, int(self.histogram[xcoord, ycoord] * 255 * 128))
                 color = (0, blue, blue)
                 self.draw_histogram.point((xcoord, ycoord), fill=color)
 
@@ -149,7 +149,7 @@ class Heatmap:
         """Plots the Heatmap"""
         for xcoord in range(0, self.screen_size[0]):
             for ycoord in range(0, self.screen_size[1]):
-                color = self.color_function(self.heatmap[xcoord][ycoord])
+                color = self.color_function(self.heatmap[xcoord, ycoord])
                 #blue = int(self.heatmap[xcoord][ycoord] * 255)
                 #color = (0, blue, blue)
                 self.draw_heatmap.point((xcoord, ycoord), fill=color)
