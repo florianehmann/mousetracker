@@ -9,9 +9,6 @@ class Heatmap:
     def __init__(self):
         # init fields
         self.screen_size = (1600, 900)
-        self.oversize = 2
-        self.canvas_size = (self.oversize * self.screen_size[0], self.oversize
-                            * self.screen_size[1])
         self.input_file = "mouse_data.txt"
         self.output_file_histogram = "histogram.jpg"
         self.output_file_heatmap = "heatmap.jpg"
@@ -79,10 +76,6 @@ class Heatmap:
                 blue = min(255, int(self.histogram[xcoord, ycoord] * 255 * 128))
                 color = (0, blue, blue)
                 self.draw_histogram.point((xcoord, ycoord), fill=color)
-
-    def canvas_coordinates(self, screenx, screeny):
-        """Returns (x,y) of the Coordinates on the oversized Canvas"""
-        return (screenx * self.oversize, screeny * self.oversize)
 
     def peak_dist(self, x, y):
         """Gaussian Peak centered on the Screen"""
