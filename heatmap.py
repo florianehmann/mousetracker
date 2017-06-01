@@ -77,15 +77,15 @@ class Heatmap:
                 color = (0, blue, blue)
                 self.draw_histogram.point((xcoord, ycoord), fill=color)
 
-    def peak_dist(self, x, y):
+    def peak_dist(self, mu_x, mu_y):
         """Gaussian Peak centered on the Screen"""
-        return np.exp((- (x - self.screen_size[0] / 2)**2 \
-            - (y - self.screen_size[1] / 2)**2) \
+        return np.exp((- (mu_x - self.screen_size[0] / 2)**2 \
+            - (mu_y - self.screen_size[1] / 2)**2) \
             /(2 * self.peak_size**2))
 
     def pad_array(self, arr):
         """Pads an Array to prevent circular Artifacts in Convolution"""
-        return np.pad(arr, ((self.padx, self.padx), (self.pady, self.pady)), 
+        return np.pad(arr, ((self.padx, self.padx), (self.pady, self.pady)),
                       mode='constant')
 
     def generate_heatmap(self):
@@ -94,7 +94,7 @@ class Heatmap:
         yaxis = np.linspace(0, self.screen_size[1], self.screen_size[1])
 
         # generate Gaussian peak
-        peak = self.peak_dist(xaxis[:,None], yaxis[None,:])
+        peak = self.peak_dist(xaxis[:, None], yaxis[None, :])
         peak = self.pad_array(peak)
         peak = np.roll(peak, int(self.screen_size[0] / 2 + self.padx), axis=0)
         peak = np.roll(peak, int(self.screen_size[1] / 2 + self.pady), axis=1)
@@ -109,7 +109,7 @@ class Heatmap:
         # convolve
         conv = peak_fft * conv
         conv = np.fft.ifft2(conv)
-        conv = conv[self.padx:-self.padx,self.pady:-self.pady]
+        conv = conv[self.padx:-self.padx, self.pady:-self.pady]
 
         self.heatmap = np.abs(conv)
 
@@ -117,40 +117,40 @@ class Heatmap:
         """Normalizes the Heatmap to Values from 0 to 1"""
         self.heatmap = self.heatmap / np.max(self.heatmap)
 
-    def color_gradient(self, l, lmin, lmax, ci, cf):
+    def color_gradient(self, lambd, lmin, lmax, cinit, cfinal):
         """A General Part of a Color Gradient"""
-        ci = np.array(ci)
-        cf = np.array(cf)
-        v = (cf - ci)
-        lconstrained = l
-        if (l > lmax):
+        cinit = np.array(cinit)
+        cfinal = np.array(cfinal)
+        vect = (cfinal - cinit)
+        lconstrained = lambd
+        if lambd > lmax:
             lconstrained = lmax
-        elif (l < lmin):
+        elif lambd < lmin:
             lconstrained = 0
-        c = ci + (lconstrained - lmin) / (lmax - lmin) * v
-        return c
+        color = cinit + (lconstrained - lmin) / (lmax - lmin) * vect
+        return color
 
-    def color_function(self, l):
+    def color_function(self, lambd):
         """Returns a Color of a Gradient"""
-        c = np.array([0,0,0])
-        if l <= 0.3:
-        	c = self.color_gradient(l, 0, 0.3, [0, 0, 0], [204, 34, 0])
-        elif l > 0.3 and l <= 0.6:
-             c = self.color_gradient(l, 0.3, 0.6, [204, 34, 0], [255, 183, 0])
-        elif l > 0.6:
-             c = self.color_gradient(l, 0.6, 1.0, [255, 183, 0], [255, 255, 255])
+        color = np.array([0, 0, 0])
+        if lambd <= 0.3:
+            color = self.color_gradient(lambd, 0, 0.3, [0, 0, 0], [204, 34, 0])
+        elif lambd > 0.3 and lambd <= 0.6:
+            color = self.color_gradient(lambd, 0.3, 0.6, [204, 34, 0], [255, 183, 0])
+        elif lambd > 0.6:
+            color = self.color_gradient(lambd, 0.6, 1.0, [255, 183, 0], [255, 255, 255])
 
-        c = c.astype(int)
-        return tuple(c)
+        color = color.astype(int)
+        return tuple(color)
 
     def plot_heatmap(self):
         """Plots the Heatmap"""
         print("\tStart Plotting")
 
         for xcoord in range(0, self.screen_size[0]):
-            CURSOR_UP_ONE = '\x1b[1A'
-            ERASE_LINE = '\x1b[2K'
-            print(CURSOR_UP_ONE + ERASE_LINE, end='')
+            cursor_up_one = '\x1b[1A'
+            erase_line = '\x1b[2K'
+            print(cursor_up_one + erase_line, end='')
             print("\tFinished %.1f percent of the Heatmap" %
                   (xcoord * 100 / self.screen_size[0]))
 
